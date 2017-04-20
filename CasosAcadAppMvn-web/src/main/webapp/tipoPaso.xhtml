@@ -5,10 +5,9 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
-        <title>Tipo Paso</title>
+        <title>Facelet Title</title>
     </h:head>
     <h:body>
-        
          <p:panel header="Tipo de Pasos para Casos Academicos" closable="false" toggleable="false" >
             <h:panelGrid>
                 <h:form id="tablaTipoPaso">
@@ -32,7 +31,7 @@
                         <p:column headerText="Observacion">
                             <p:outputLabel value="#{r.observacion}"></p:outputLabel>
                         </p:column>
-                        <p:ajax update=":vistaPaso" event="rowSelect" ></p:ajax>
+                        <p:ajax update=":vistaPaso" event="rowSelect" listener="${frmTipoPaso.cambioTabla}" ></p:ajax>
                     </p:dataTable>    
                     <p:growl id="growl" life="2000" />
                 </h:form>
@@ -40,7 +39,6 @@
         </p:panel>
         
         <div align="center">
-           
             <p:panel id="panelMenu">
                 
                     <h:form id="vistaPaso">
@@ -57,14 +55,19 @@
                 </p:selectOneRadio>
                 <p:outputLabel value="Observacion" for="txtObservacion" id="lblObservacion"></p:outputLabel>
                 <p:inputText id="txtObservacion"  value="#{frmTipoPaso.registro.observacion}" required="true"></p:inputText>
-                <p:commandButton value="Nuevo">    
+                <p:commandButton value="Nuevo" actionListener="#{frmTipoPaso.btnNuevoAction}" update=":vistaPaso">    
                 </p:commandButton>
-                <p:commandButton value="Modificar" actionListener="#{frmTipoPaso.btnModificarAction}" update="tablaTipoPaso">                   
+                <p:commandButton value="Modificar" actionListener="#{frmTipoPaso.btnModificarAction}" update=":tablaTipoPaso :vistaPaso" rendered="${frmTipoPaso.editar}">                   
                 </p:commandButton>        
-                <p:commandButton value="GUARDAR" actionListener="#{frmTipoPaso.btnGuardarAction}" update="tablaTipoPaso"></p:commandButton> 
-                <p:commandButton value="Eliminar" actionListener="#{frmTipoPaso.btnEliminarAction}" update="tablaTipoPaso" ></p:commandButton>
+                <p:commandButton value="Guardar" actionListener="#{frmTipoPaso.btnGuardarAction}" update=":tablaTipoPaso :vistaPaso" rendered="${!frmTipoPaso.editar}"></p:commandButton> 
+                <p:commandButton value="Eliminar" actionListener="#{frmTipoPaso.btnEliminarAction}" update=":tablaTipoPaso :vistaPaso" >
+                 <p:confirm header="Confirmacion" message="¿Está seguro que desea eliminar este elemento?" icon="ui-icon-alert" />
+                </p:commandButton>
             </p:panelGrid>
-            
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+        <p:commandButton value="SI" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+        <p:commandButton value="NO" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+          </p:confirmDialog>
           
                         
                     </h:form>

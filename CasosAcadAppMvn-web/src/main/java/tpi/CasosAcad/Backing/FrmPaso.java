@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -17,6 +19,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import tpi.CasosAcad.Entidades.Paso;
@@ -37,8 +40,9 @@ public class FrmPaso implements Serializable{
 
     private LazyDataModel<Paso> modeloPaso;
      
-    private Paso registroP =new Paso();
+    private Paso registroP;// =new Paso();
     private List<TipoPaso> tipos;
+    private boolean editar= false;
     
     @EJB
     private PasoFacadeLocal pfl;
@@ -113,6 +117,28 @@ public class FrmPaso implements Serializable{
         }
     
     }
+     public void cambioTabla(){
+        this.editar = true;
+    }
+    
+    public void limpiar(){
+      
+        RequestContext.getCurrentInstance().reset(":tabViewPaso:edAddPaso");
+        this.registroP= new Paso();
+    }
+    
+    public void btnNuevoAction(ActionEvent ae){
+    editar=false;
+      try{
+      
+          limpiar();
+      
+      }catch(Exception e){
+      Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
+      
+      }
+    
+    }
     
     
           public void btnGuardarAction(ActionEvent ae){
@@ -122,9 +148,10 @@ public class FrmPaso implements Serializable{
                 FacesMessage msj = new FacesMessage(FacesMessage.SEVERITY_INFO, resultado?"Creado con exito":"Error", null);
                 //this.agregar = !resultado;
                 FacesContext.getCurrentInstance().addMessage(null, msj);
+                limpiar();
             }
         } catch (Exception e) {
-           
+           Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
         }
      
       }
@@ -136,8 +163,9 @@ public class FrmPaso implements Serializable{
             FacesMessage msj = new FacesMessage(FacesMessage.SEVERITY_INFO, resultado?"Modificado con exito":"Error", null);
             //this.editar = resultado;
             FacesContext.getCurrentInstance().addMessage(null, msj);
+            limpiar();
         }catch(Exception e){
-            System.err.println(""+e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
         }
     }
 
@@ -145,10 +173,14 @@ public class FrmPaso implements Serializable{
         try {
             if(this.registroP != null && this.pfl != null){
                 boolean resultado = this.pfl.remove(registroP);
+                editar=!resultado;
                 FacesMessage msj = new FacesMessage(FacesMessage.SEVERITY_INFO, resultado?"Eliminado con exito":"Error", null);
                 FacesContext.getCurrentInstance().addMessage(null, msj);
+                limpiar();
+                
             }
         } catch (Exception e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE,e.getMessage(),e);
         }
     }
 
@@ -157,7 +189,7 @@ public class FrmPaso implements Serializable{
      * Creates a new instance of FrmPaso
      */
     public FrmPaso() {
-        
+        this.registroP=new Paso();
     }
 
     public LazyDataModel<Paso> getModeloPaso() {
@@ -183,6 +215,14 @@ public class FrmPaso implements Serializable{
 
     public void setTipos(List<TipoPaso> tipos) {
         this.tipos = tipos;
+    }
+
+    public boolean isEditar() {
+        return editar;
+    }
+
+    public void setEditar(boolean editar) {
+        this.editar = editar;
     }
     
 }
